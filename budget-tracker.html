@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Budget Tracker</title>
+    <style>
+        :root {
+            --bg: #F5F7FA;
+            --text: #1A2332;
+            --muted: #64748B;
+            --income: #0F766E;
+            --expense: #B91C1C;
+            --accent: #3730A3;
+            --card: #FFFFFF;
+            --border: #E2E8F0;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 2.5rem 1rem;
+        }
+
+        .app {
+            max-width: 480px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            letter-spacing: -0.01em;
+            margin: 0 0 0.2rem;
+        }
+
+        .subtitle {
+            color: var(--muted);
+            font-size: 0.875rem;
+            margin: 0 0 1.5rem;
+        }
+
+        .balance-card {
+            background: var(--card);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            margin-bottom: 1.5rem;
+        }
+
+        .balance-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--muted);
+        }
+
+        .balance-amount {
+            font-family: 'Courier New', monospace;
+            font-size: 2.4rem;
+            font-weight: 700;
+            margin: 0.3rem 0;
+        }
+
+        .balance-amount.positive {
+            color: var(--income);
+        }
+
+        .balance-amount.negative {
+            color: var(--expense);
+        }
+
+        .summary-row {
+            display: flex;
+            gap: 1rem;
+            margin-top: 0.75rem;
+        }
+
+        .summary-item {
+            flex: 1;
+            font-size: 0.8rem;
+            color: var(--muted);
+        }
+
+        .summary-item .value {
+            font-family: 'Courier New', monospace;
+            font-weight: 600;
+            display: block;
+            font-size: 1rem;
+            color: var(--text);
+            margin-top: 2px;
+        }
+
+        form {
+            background: var(--card);
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+
+        .field {
+            margin-bottom: 0.85rem;
+        }
+
+        label {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--muted);
+            margin-bottom: 0.3rem;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 0.6rem 0.7rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-family: inherit;
+        }
+
+        .type-toggle {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .type-toggle button {
+            flex: 1;
+            padding: 0.6rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: white;
+            cursor: pointer;
+            font-size: 0.9rem;
+            color: var(--text);
+        }
+
+        .type-toggle button.active[data-type="income"] {
+            background: var(--income);
+            color: white;
+            border-color: var(--income);
+        }
+
+        .type-toggle button.active[data-type="expense"] {
+            background: var(--expense);
+            color: white;
+            border-color: var(--expense);
+        }
+
+        button[type="submit"] {
+            width: 100%;
+            padding: 0.75rem;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 0.25rem;
+        }
+
+        button[type="submit"]:hover {
+            opacity: 0.9;
+        }
+
+        .list-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--muted);
+            margin-bottom: 0.6rem;
+        }
+
+        .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--card);
+            border-radius: 10px;
+            padding: 0.85rem 1rem;
+            margin-bottom: 0.5rem;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+        }
+
+        .transaction-info .desc {
+            font-size: 0.9rem;
+        }
+
+        .transaction-info .date {
+            font-size: 0.75rem;
+            color: #94A3B8;
+        }
+
+        .transaction-amount {
+            font-family: 'Courier New', monospace;
+            font-weight: 600;
+        }
+
+        .transaction-amount.income {
+            color: var(--income);
+        }
+
+        .transaction-amount.expense {
+            color: var(--expense);
+        }
+
+        .delete-btn {
+            background: none;
+            border: none;
+            color: #94A3B8;
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 0 0.3rem;
+            margin-left: 0.6rem;
+        }
+
+        .delete-btn:hover {
+            color: var(--expense);
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #94A3B8;
+            font-size: 0.875rem;
+            padding: 2rem 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app">
+        <h1>Budget Tracker</h1>
+        <p class="subtitle">Justins way to track your finances!!</p>
+
+        <div class="balance-card">
+            <div class="balance-label">Current Balance</div>
+            <div class="balance-amount" id="balanceDisplay">$0.00</div>
+            <div class="summary-row">
+                <div class="summary-item">Income<span class="value" id="totalIncome">$0.00</span></div>
+                <div class="summary-item">Expenses<span class="value" id="totalExpenses">$0.00</span></div>
+            </div>
+        </div>
+
+        <form id="transactionForm">
+            <div class="field">
+                <label for="description">Description</label>
+                <input type="text" id="description" placeholder="e.g. Groceries, Paycheck, Bills, Basura" required>
+            </div>
+            <div class="field">
+                <label for="amount">Amount</label>
+                <input type="number" id="amount" placeholder="0.00" step="0.01" min="0.01" required>
+            </div>
+            <div class="field">
+                <label>Type</label>
+                <div class="type-toggle">
+                    <button type="button" data-type="income" class="active">Income</button>
+                    <button type="button" data-type="expense">Expense</button>
+                </div>
+            </div>
+            <button type="submit">Add Transaction</button>
+        </form>
+
+        <div class="list-label">Transactions</div>
+        <div id="transactionList"></div>
+    </div>
+
+    <script>
+        // ============================================================
+        // BUDGET TRACKER — annotated for someone coming from Java
+        // ============================================================
+
+        // --- 1. THE MODEL ---------------------------------------------------
+        // In Java you'd write something like:
+        //   public class Transaction {
+        //       int id; String description; double amount; String type;
+        //       public Transaction(int id, String description, double amount, String type) {
+        //           this.id = id; this.description = description;
+        //           this.amount = amount; this.type = type;
+        //       }
+        //   }
+        // A JS class looks almost identical — same "constructor" idea, just no
+        // type declarations on the fields.
+        class Transaction {
+            constructor(id, description, amount, type) {
+                this.id = id;
+                this.description = description;
+                this.amount = amount;
+                this.type = type; // "income" or "expense"
+                this.date = new Date().toLocaleDateString();
+            }
+        }
+
+        // --- 2. THE DATA -----------------------------------------------------
+        // Same idea as `ArrayList<Transaction> transactions = new ArrayList<>();`
+        // JS arrays just don't need a declared type.
+        let transactions = [];
+        let nextId = 1; // stands in for an auto-incrementing ID
+
+        // --- 3. SAVING/LOADING -------------------------------------------------
+        // Browsers give every page a small built-in storage called localStorage.
+        // It only stores strings, so we convert the array to text (JSON) to save,
+        // and convert it back to objects to read — similar in spirit to writing
+        // objects to a file in Java, but built in and far less code.
+        function loadTransactions() {
+            const saved = localStorage.getItem('transactions');
+            if (saved) {
+                transactions = JSON.parse(saved);
+                nextId = transactions.length ? Math.max(...transactions.map(t => t.id)) + 1 : 1;
+            }
+        }
+
+        function saveTransactions() {
+            localStorage.setItem('transactions', JSON.stringify(transactions));
+        }
+
+        // --- 4. TRACKING THE SELECTED TYPE (Income/Expense buttons) -------------
+        let selectedType = 'income';
+        const typeButtons = document.querySelectorAll('.type-toggle button');
+        typeButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                selectedType = btn.dataset.type;
+                typeButtons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            });
+        });
+
+        // --- 5. HANDLING THE FORM SUBMIT ----------------------------------------
+        // addEventListener is JS's version of registering a listener. If you used
+        // Swing in Programming 2, this is the same idea as button.addActionListener(...).
+        const form = document.getElementById('transactionForm');
+        form.addEventListener('submit', function (event) {
+            event.preventDefault(); // stop the browser from reloading the page
+            const description = document.getElementById('description').value;
+            const amount = parseFloat(document.getElementById('amount').value);
+
+            const newTransaction = new Transaction(nextId++, description, amount, selectedType);
+            transactions.push(newTransaction); // same as ArrayList.add(...)
+
+            saveTransactions();
+            render();
+            form.reset();
+        });
+
+        // --- 6. THE MATH — pure logic, exactly like Java ------------------------
+        // A for-each loop in Java:
+        //   double income = 0, expenses = 0;
+        //   for (Transaction t : transactions) {
+        //       if (t.type.equals("income")) income += t.amount; else expenses += t.amount;
+        //   }
+        function calculateTotals() {
+            let income = 0;
+            let expenses = 0;
+            for (const t of transactions) { // JS's for-of === Java's for-each
+                if (t.type === 'income') {
+                    income += t.amount;
+                } else {
+                    expenses += t.amount;
+                }
+            }
+            return { income, expenses, balance: income - expenses };
+        }
+
+        // --- 7. DELETING A TRANSACTION -------------------------------------------
+        function deleteTransaction(id) {
+            transactions = transactions.filter(t => t.id !== id); // keep everything except the match
+            saveTransactions();
+            render();
+        }
+
+        // --- 8. UPDATING THE PAGE (the genuinely new concept) ---------------------
+        // Java has no real equivalent to this: a console program just prints text,
+        // and Swing redraws components for you. In the browser, the page is a tree
+        // of elements (the DOM), and we update what's on screen by writing into it
+        // directly.
+        function render() {
+            const { income, expenses, balance } = calculateTotals();
+
+            document.getElementById('totalIncome').textContent = formatCurrency(income);
+            document.getElementById('totalExpenses').textContent = formatCurrency(expenses);
+
+            const balanceEl = document.getElementById('balanceDisplay');
+            balanceEl.textContent = (balance < 0 ? '-' : '') + formatCurrency(balance);
+            balanceEl.classList.toggle('positive', balance >= 0);
+            balanceEl.classList.toggle('negative', balance < 0);
+
+            const list = document.getElementById('transactionList');
+
+            if (transactions.length === 0) {
+                list.innerHTML = '<div class="empty-state">No transactions yet — add your first one above.</div>';
+                return;
+            }
+
+            // Build one HTML string for all transactions, newest first.
+            list.innerHTML = transactions
+                .slice()
+                .reverse()
+                .map(t => `
+      <div class="transaction">
+        <div class="transaction-info">
+          <div class="desc">${t.description}</div>
+          <div class="date">${t.date}</div>
+        </div>
+        <div>
+          <span class="transaction-amount ${t.type}">${t.type === 'income' ? '+' : '-'}${formatCurrency(t.amount)}</span>
+          <button class="delete-btn" onclick="deleteTransaction(${t.id})">✕</button>
+        </div>
+      </div>
+    `)
+                .join('');
+        }
+
+        function formatCurrency(num) {
+            return '$' + Math.abs(num).toFixed(2);
+        }
+
+        // --- 9. RUN ON PAGE LOAD ----------------------------------------------------
+        loadTransactions();
+        render();
+    </script>
+</body>
+
+</html>
